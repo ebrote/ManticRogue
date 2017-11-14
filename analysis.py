@@ -32,8 +32,8 @@ class Mairies():
 
 engine = create_engine('sqlite:///data/database.db', echo=False)
 metadata = MetaData(engine)
-mairies = Table('mairies', metadata, autoload=True)
-mapper(Mairies, mairies)
+mayors = Table('mayors', metadata, autoload=True)
+mapper(Mayors, mayors)
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -46,10 +46,10 @@ def data_frame(query, columns):
     return pd.DataFrame([make_row(x) for x in query])
 
 # dataframe with all fields in the table
-query = session.query(Mairies).all()
+query = session.query(Mayors).all()
 DF = data_frame(query, ["insee_code","postal_code","city", "population" ,"latitude" ,"longitude","first_name","last_name","birthdate","first_mandate_date","party"])
 
-DF2 = pd.DataFrame(session.query(mairies).all()).query("latitude != 'None' and longitude != 'None'")
+DF2 = pd.DataFrame(session.query(mayors).all()).query("latitude != 'None' and longitude != 'None'")
 DF["population"] = DF["population"].apply(pd.to_numeric)
 #DF["first_mandate_date"] = DF["first_mandate_date"].apply(pd.to_numeric)
 # DF['latitude'] = DF['latitude'].astype(numeric)
@@ -68,7 +68,7 @@ def clustering(DF_o,n_clusters=5):
 	data = DF_o.as_matrix()
 
 
-	kmeans = KMeans(init='k-means++', n_clusters=n_clusters, n_init=10)
+	kmeans = KMeans(init='k-means++', n_clusters=n_clusters, n_init=5)
 	kmeans.fit(data)
 
 	Z = kmeans.predict(data)
